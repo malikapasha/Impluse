@@ -3,14 +3,19 @@ package com.feedback.impluse.ui.home;
 import static com.feedback.impluse.SplashActivity.deviceid;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -21,6 +26,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -40,96 +47,120 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final WebView webview = binding.webview;
 
-        webview.setScrollContainer(false);
-        webview.getSettings().setJavaScriptEnabled(true);
-
-
-        webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-
-        webview.loadUrl("https://beta-app.askimpulse.com/?token="+deviceid);
-
-
-        WebSettings webSettings = webview.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-
-        Log.e("url","https://beta-app.askimpulse.com/?token="+deviceid);
-
-        webview.setWebViewClient(new WebViewClient()
+        if(!isConnected(getContext()))
         {
+            new AlertDialog.Builder(getContext()).setMessage("Internet not working!").setTitle("Alert!").setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            }).show();
+        }
+        else {
+            final WebView webview = binding.webview;
+
+//        webview.setInitialScale(3);
+//        webview.getSettings().setLoadWithOverviewMode(true);
+//        webview.getSettings().setUseWideViewPort(true);
+
+            //   webview.setScrollContainer(false);
+//        webview.getSettings().setJavaScriptEnabled(true);
 
 
-            @Override
-            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                super.onReceivedError(view, request, error);
-                Toast.makeText(getActivity(), "An error Occurred, Try Again!" , Toast.LENGTH_LONG).show();
+           // webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
 
-                Log.e("testweb","error");
 
-            }
+            WebSettings webSettings = webview.getSettings();
+            webSettings.setJavaScriptEnabled(true);
 
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                super.onPageStarted(view, url, favicon);
+            webSettings.setSupportZoom(true);
+            webSettings.setBuiltInZoomControls(true);
+            webSettings.setDisplayZoomControls(false);
+
+            webview.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+            webview.getSettings().setAppCacheEnabled(true);
+
+            webview.getSettings().setAppCachePath(getContext().getCacheDir().getAbsolutePath());
+
+            Log.e("url", "https://app.askimpulse.com/?token=" + deviceid);
+
+
+            webview.setWebViewClient(new WebViewClient() {
+
+
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                    super.onReceivedError(view, request, error);
+                    //Toast.makeText(getActivity(), "An error Occurred, Try Again!", Toast.LENGTH_LONG).show();
+
+                    Log.e("testweb", error.getDescription() + " " + error.getErrorCode());
+
+                }
+
+                @Override
+                public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                    super.onPageStarted(view, url, favicon);
 
 //                callprogress();
-            }
+                }
 
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
+                @Override
+                public void onPageFinished(WebView view, String url) {
+                    super.onPageFinished(view, url);
 
-                webview.loadUrl("javascript:(function() { " +
-                        "var head = document.getElementsByClassName('header')[0].style.display='none'; " +
-                        "})()");
+//                    webview.loadUrl("javascript:(function() { " +
+//                            "var head = document.getElementsByClassName('header')[0].style.display='none'; " +
+//                            "})()");
 
-//                webview.loadUrl("javascript:(function() { " +
-//                        "var head = document.getElementsByTagName('header')[0];"
-//                        + "head.parentNode.removeChild(head);" +
-//                        "})()");
 //
-//                webview.loadUrl("javascript:(function() { " +
-//                        "var head = document.getElementsByTagName('footer')[0];"
-//                        + "head.parentNode.removeChild(head);" +
-//                        "})()");
 
-                Log.e("testwebdata","finish");
+                    Log.e("testwebdata", "finish");
 
 
-                try
-                {
+                    try {
 
 
-                    Log.e("testwebdata","try");
-                }
-                catch (Exception ex)
-                {
-                    Log.e("testwebdata","catch");
+                        Log.e("testwebdata", "try");
+                    } catch (Exception ex) {
+                        Log.e("testwebdata", "catch");
+                    }
+
                 }
 
-            }
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
 
-            public boolean shouldOverrideUrlLoading(WebView view, String url)
-            {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(intent);
 
-                try
-                {
 
-                    Log.e("testwebdata","overrideurl");
+//                try
+//                {
+//
+//                    Log.e("testwebdata","overrideurl");
+//
+//                    webview.loadUrl(url+"");
+//                }
+//                catch (Exception ex)
+//                {
+//                    Log.e("testwebdata","catch");
+//                }
 
-                    webview.loadUrl(url+"");
+                    return true;
                 }
-                catch (Exception ex)
-                {
-                    Log.e("testwebdata","catch");
+
+            });
+
+            webview.setWebChromeClient(new WebChromeClient() {
+                public void onProgressChanged(WebView view, int progress) {
+
+
                 }
+            });
+            webview.loadUrl("https://app.askimpulse.com/?token=" + deviceid);
 
-                return true;
-            }
-
-        });
-
+        }
 
         return root;
     }

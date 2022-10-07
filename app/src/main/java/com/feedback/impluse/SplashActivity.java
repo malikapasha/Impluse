@@ -82,21 +82,16 @@ public class SplashActivity extends AppCompatActivity {
 
                     if(new SessionManager(SplashActivity.this).isLoggedIn())
                     {
-//                    new SessionManager(Splash.this).setKeyHaveJob(false);
-
                         startActivity(new Intent(SplashActivity.this,Dashboard.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                         finish();
                         Log.e("sessionlogin",new SessionManager(SplashActivity.this).isLoggedIn()+" ");
                     }
                     else {
-                        Intent intent=new Intent(SplashActivity.this, Dashboard.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        Intent intent=new Intent(SplashActivity.this, IntroActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
                         finish();
                     }
 
-//Intent intent=new Intent(SplashActivity.this, SliderActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//startActivity(intent);
-//finish();
                 }
             }
         }, 100);

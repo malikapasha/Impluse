@@ -1,6 +1,10 @@
 package com.feedback.impluse;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -20,8 +24,15 @@ public class Dashboard extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+
         binding = ActivityDashboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        getWindow(). addFlags (WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
@@ -34,4 +45,29 @@ public class Dashboard extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
 
+    int isclose = 0;
+
+    @Override
+    public void onBackPressed() {
+       // super.onBackPressed();
+
+        Toast.makeText(this, "Back Press Again to Exit", Toast.LENGTH_SHORT).show();
+
+        if(isclose == 1)
+        {
+
+            super.onBackPressed();
+        }
+
+        if(isclose == 0) {
+            isclose = 1;
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    isclose = 0;
+                }
+            }, 2000);
+        }
+
+    }
 }
